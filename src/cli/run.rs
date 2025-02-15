@@ -716,6 +716,9 @@ impl Run {
                         .stdin(Stdio::inherit())
                         .stdout(Stdio::inherit())
                         .stderr(Stdio::inherit())
+                } else {
+                    cmd = cmd
+                        .stdin(Stdio::inherit())
                 }
             }
         }
