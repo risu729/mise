@@ -267,8 +267,8 @@ impl Run {
         }
 
         self.fetch_tasks(&mut tasks)?;
-        let tasks = Deps::new(tasks)?;
-        for task in tasks.all() {
+        let deps: Deps = Deps::new(tasks.clone())?;
+        for task in deps.all() {
             self.validate_task(task)?;
             match self.output(Some(task)) {
                 TaskOutput::KeepOrder => {
@@ -285,12 +285,22 @@ impl Run {
             }
         }
 
-        let num_tasks = tasks.all().count();
-        self.is_linear = tasks.is_linear();
-        self.output = Some(self.output(None));
+        let num_tasks = deps.all().count();
+        self.is_linear = deps.is_linear();
+        // prioritize silent, quiet, interleave, and lastly others
+        self.output = tasks.iter().map(|t| self.output(Some(t)))
+            .min_by_key(|o| match o {
+                TaskOutput::Silent => 0,
+                TaskOutput::Quiet => 1,
+                TaskOutput::Interleave => 2,
+                TaskOutput::KeepOrder => 3,
+                TaskOutput::Replacing => 4,
+                TaskOutput::Timed => 5,
+                TaskOutput::Prefix => 6,
+            });
 
         let mut all_tools = self.tool.clone();
-        for t in tasks.all() {
+        for t in deps.all() {
             for (k, v) in &t.tools {
                 all_tools.push(format!("{}@{}", k, v).parse()?);
             }
@@ -304,7 +314,7 @@ impl Run {
             ..Default::default()
         })?;
 
-        let tasks = Mutex::new(tasks);
+        let tasks = Mutex::new(deps);
         let timer = std::time::Instant::now();
 
         let pool = rayon::ThreadPoolBuilder::new()
