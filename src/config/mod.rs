@@ -219,14 +219,18 @@ impl Config {
         self.shorthands.get_or_init(|| get_shorthands(&SETTINGS))
     }
     pub fn get_tool_request_set(&self) -> eyre::Result<&ToolRequestSet> {
+        debug!("get_tool_request_set");
         self.tool_request_set
             .get_or_try_init(|| ToolRequestSetBuilder::new().build())
     }
 
     pub fn get_toolset(&self) -> Result<&Toolset> {
+        debug!("get_toolset");
         self.toolset.get_or_try_init(|| {
             let mut ts = Toolset::from(self.get_tool_request_set()?.clone());
+            debug!("try to resolve toolset");
             ts.resolve()?;
+            debug!("toolset resolved");
             Ok(ts)
         })
     }

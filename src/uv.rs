@@ -6,7 +6,7 @@ use crate::{dirs, file};
 use eyre::Result;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::LazyLock as Lazy;
+use std::sync::{LazyLock as Lazy, Mutex};
 
 #[derive(Debug)]
 pub struct Venv {
@@ -14,10 +14,11 @@ pub struct Venv {
     pub env: HashMap<String, String>,
 }
 
-pub static UV_VENV: Lazy<Option<Venv>> = Lazy::new(|| {
+pub static UV_VENV: Mutex<Lazy<Option<Venv>>> = Mutex::new(Lazy::new(|| {
     if !SETTINGS.python.uv_venv_auto {
         return None;
     }
+    debug!("initializing uv venv");
     if let (Some(venv_path), Some(uv_path)) = (venv_path(), uv_path()) {
         match get_or_create_venv(venv_path, uv_path) {
             Ok(venv) => return Some(venv),
@@ -27,7 +28,7 @@ pub static UV_VENV: Lazy<Option<Venv>> = Lazy::new(|| {
         }
     }
     None
-});
+}));
 
 fn get_or_create_venv(venv_path: PathBuf, uv_path: PathBuf) -> Result<Venv> {
     SETTINGS.ensure_experimental("uv venv auto")?;
@@ -68,9 +69,11 @@ fn uv_root() -> Option<PathBuf> {
     file::find_up(dirs::CWD.as_ref()?, &["uv.lock"]).map(|p| p.parent().unwrap().to_path_buf())
 }
 fn venv_path() -> Option<PathBuf> {
+    debug!("uv venv path");
     Some(uv_root()?.join(".venv"))
 }
 fn uv_path() -> Option<PathBuf> {
+    debug!("uv path");
     Config::get()
         .get_toolset()
         .ok()?

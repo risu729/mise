@@ -37,6 +37,7 @@ impl ToolVersion {
     }
 
     pub fn resolve(request: ToolRequest, opts: &ResolveOptions) -> Result<Self> {
+        // 新しいのが来ると止まる
         trace!("resolving {} {}", &request, opts);
         if opts.use_locked_version {
             if let Some(lt) = request.lockfile_resolve()? {

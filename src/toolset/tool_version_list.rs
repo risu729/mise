@@ -23,6 +23,7 @@ impl ToolVersionList {
         }
     }
     pub fn resolve(&mut self, opts: &ResolveOptions) -> eyre::Result<()> {
+        debug!("Resolving versions for {}", self.backend);
         self.versions.clear();
         for tvr in &mut self.requests {
             match tvr.resolve(opts) {
@@ -37,6 +38,7 @@ impl ToolVersionList {
                 }
             }
         }
+        debug!("Resolved versions for {}", self.backend);
         Ok(())
     }
 }

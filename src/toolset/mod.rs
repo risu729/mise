@@ -143,15 +143,18 @@ impl Toolset {
     }
     pub fn resolve(&mut self) -> eyre::Result<()> {
         self.list_missing_plugins();
+        debug!("resolving versions");
         let errors = self
             .versions
             .iter_mut()
             .collect::<Vec<_>>()
             .par_iter_mut()
+            // ここっぽい
             .map(|(_, v)| v.resolve(&Default::default()))
             .filter(|r| r.is_err())
             .map(|r| r.unwrap_err())
             .collect::<Vec<_>>();
+        debug!("resolved versions");
         match errors.is_empty() {
             true => Ok(()),
             false => {
@@ -519,11 +522,15 @@ impl Toolset {
             env.insert(PATH_KEY.to_string(), add_paths);
         }
         env.extend(config.env()?.clone());
-        if let Some(venv) = &*UV_VENV {
-            for (k, v) in &venv.env {
-                env.insert(k.clone(), v.clone());
+        debug!("trying to get uv venv in env");
+        if let Ok(guard) = UV_VENV.try_lock() {
+            if let Some(venv) = &**guard {
+                for (k, v) in &venv.env {
+                    env.insert(k.clone(), v.clone());
+                }
             }
         }
+        debug!("uv venv loaded into env");
         time!("env end");
         Ok(env)
     }
@@ -573,9 +580,13 @@ impl Toolset {
         for p in config.path_dirs()?.clone() {
             paths.insert(p);
         }
-        if let Some(venv) = &*UV_VENV {
-            paths.insert(venv.venv_path.clone());
+        debug!("trying to get uv venv in list_final_paths");
+        if let Ok(guard) = UV_VENV.try_lock() {
+            if let Some(venv) = &**guard {
+                paths.insert(venv.venv_path.clone());
+            }
         }
+        debug!("uv venv loaded into list_final_paths");
         if let Some(path) = self.env(config)?.get(&*PATH_KEY) {
             paths.insert(PathBuf::from(path));
         }
@@ -611,6 +622,7 @@ impl Toolset {
             })
     }
     pub fn which_bin(&self, bin_name: &str) -> Option<PathBuf> {
+        debug!("which_bin");
         self.which(bin_name)
             .and_then(|(p, tv)| p.which(&tv, bin_name).ok())
             .flatten()
