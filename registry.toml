@@ -3211,6 +3211,7 @@ tree-sitter.backends = [
     "aqua:tree-sitter/tree-sitter",
     "asdf:ivanvc/asdf-tree-sitter"
 ]
+tree-sitter.test = ["tree-sitter --version", "tree-sitter {{version}}"]
 # Is still here ? Seem there's a trident thing, but tridentctl ?
 tridentctl.backends = [
     "aqua:NetApp/trident/tridentctl",
