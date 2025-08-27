@@ -278,7 +278,7 @@ impl ErlangPlugin {
                     tv.install_path()
                 )
                 .env("KERL_BASE_DIR", self.ba.cache_path.join("kerl"))
-                .env("MAKEFLAGS", format!("-j{}", num_cpus::get()))
+                .env("MAKEFLAGS", format!("-j {}", num_cpus::get()))
                 .run()?;
             }
         }

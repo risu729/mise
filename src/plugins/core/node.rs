@@ -571,7 +571,7 @@ fn configure_cmd(install_path: &Path) -> String {
 fn make_cmd() -> String {
     let mut make_cmd = env::MISE_NODE_MAKE.to_string();
     if let Some(concurrency) = *env::MISE_NODE_CONCURRENCY {
-        make_cmd.push_str(&format!(" -j{concurrency}"));
+        make_cmd.push_str(&format!(" -j {concurrency}"));
     }
     if let Some(opts) = &*env::MISE_NODE_MAKE_OPTS {
         make_cmd.push_str(&format!(" {opts}"));
