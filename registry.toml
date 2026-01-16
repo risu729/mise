@@ -2750,7 +2750,7 @@ test = ["krew version", "GitTag            v{{version}}"]
 backends = ["github:kscripting/kscript", "asdf:edgelevel/asdf-kscript"]
 depends = ["kotlin"]
 description = "Scripting enhancements for Kotlin"
-test = ["kscript --version 2>&1", "Version   : {{version}}"]
+test = ["kscript --version", "Version   : {{version}}"]
 
 [tools.ksops]
 backends = ["aqua:viaduct-ai/kustomize-sops", "asdf:janpieper/asdf-ksops"]
