@@ -420,7 +420,7 @@ impl Backend for JavaPlugin {
             }
             Ok(vec![format!("{vendor}-{version}")])
         } else {
-            Ok(vec![contents.trim().to_string()])
+            Ok(vec![contents])
         }
     }
 
