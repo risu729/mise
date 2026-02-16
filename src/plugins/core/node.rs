@@ -487,7 +487,7 @@ impl Backend for NodePlugin {
         Ok(aliases)
     }
 
-    async fn idiomatic_filenames(&self) -> Result<Vec<String>> {
+    async fn _idiomatic_filenames(&self) -> Result<Vec<String>> {
         Ok(vec![
             ".node-version".into(),
             ".nvmrc".into(),
@@ -495,13 +495,7 @@ impl Backend for NodePlugin {
         ])
     }
 
-    async fn parse_idiomatic_file(&self, path: &Path) -> Result<String> {
-        if path.file_name().is_some_and(|f| f == "package.json") {
-            let pkg = crate::package_json::PackageJson::parse(path)?;
-            return pkg
-                .runtime_version("node")
-                .ok_or_else(|| eyre::eyre!("no node version found in package.json"));
-        }
+    async fn parse_idiomatic_file(&self, path: &Path) -> Result<Vec<String>> {
         let body = file::read_to_string(path)?;
         // strip comments
         let body = body.split('#').next().unwrap_or_default().to_string();
@@ -509,7 +503,7 @@ impl Backend for NodePlugin {
         let body = body.trim().strip_prefix('v').unwrap_or(&body);
         // replace lts/* with lts
         let body = body.replace("lts/*", "lts");
-        Ok(body)
+        Ok(vec![body])
     }
 
     async fn install_version_(
