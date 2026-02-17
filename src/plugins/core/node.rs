@@ -498,9 +498,9 @@ impl Backend for NodePlugin {
     async fn parse_idiomatic_file(&self, path: &Path) -> Result<Vec<String>> {
         let body = file::read_to_string(path)?;
         // strip comments
-        let body = body.split('#').next().unwrap_or_default().to_string();
+        let body = body.split('#').next().unwrap_or_default().to_string().trim();
         // trim "v" prefix
-        let body = body.trim().strip_prefix('v').unwrap_or(&body);
+        let body = body.strip_prefix('v').unwrap_or(body);
         // replace lts/* with lts
         let body = body.replace("lts/*", "lts");
         Ok(vec![body])
