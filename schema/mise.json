@@ -2336,7 +2336,17 @@
             "properties": {
               "script": {
                 "description": "script to run",
-                "type": "string"
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
               },
               "shell": {
                 "description": "specify the shell to run the script inside of",
@@ -2369,7 +2379,17 @@
                   "properties": {
                     "script": {
                       "description": "script to run",
-                      "type": "string"
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      ]
                     },
                     "shell": {
                       "description": "specify the shell to run the script inside of",

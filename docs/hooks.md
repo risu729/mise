@@ -134,6 +134,17 @@ shell = "bash"
 script = "source completions.sh"
 ```
 
+`script` can also be an array when a shell hook needs multiple lines:
+
+```toml
+[[hooks.enter]]
+shell = "fish"
+script = [
+  "kubectl completion fish | source",
+  "talosctl completion fish | source",
+]
+```
+
 ::: warning
 I feel this should be obvious but in case it's not, this isn't going to do any sort of cleanup
 when you _leave_ the directory like using `[env]` does in `mise.toml`. You're literally just

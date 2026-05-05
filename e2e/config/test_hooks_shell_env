@@ -24,3 +24,20 @@ cd ~/workdir || exit 1
 # The output should contain an export of MISE_PROJECT_ROOT before the script
 assert_contains "mise hook-env 2>&1" "MISE_PROJECT_ROOT"
 assert_contains "mise hook-env 2>&1" "MISE_CONFIG_ROOT"
+
+cat <<'EOF' >mise.toml
+[[hooks.enter]]
+shell = "bash"
+script = [
+  'echo SHELL_ARRAY_PROJECT_ROOT=$MISE_PROJECT_ROOT',
+  'echo SHELL_ARRAY_CONFIG_ROOT=$MISE_CONFIG_ROOT',
+]
+EOF
+
+cd ~ || exit 1
+eval "$(mise hook-env)"
+
+cd ~/workdir || exit 1
+output=$(mise hook-env 2>&1)
+assert_contains "echo '$output'" "SHELL_ARRAY_PROJECT_ROOT"
+assert_contains "echo '$output'" "SHELL_ARRAY_CONFIG_ROOT"

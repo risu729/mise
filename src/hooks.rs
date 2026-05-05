@@ -60,13 +60,29 @@ pub enum HookDef {
     Script(String),
     /// Table with script and optional shell: `enter = { script = "echo hello", shell = "bash" }`
     Table {
-        script: String,
+        script: HookScript,
         shell: Option<String>,
     },
     /// Task reference: `enter = { task = "setup" }`
     TaskRef { task: String },
     /// Array of hook definitions: `enter = ["echo hello", { task = "setup" }]`
     Array(Vec<HookDef>),
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+#[serde(untagged)]
+pub enum HookScript {
+    String(String),
+    Array(Vec<String>),
+}
+
+impl HookScript {
+    pub fn into_script(self) -> String {
+        match self {
+            HookScript::String(script) => script,
+            HookScript::Array(script) => script.join("\n"),
+        }
+    }
 }
 
 impl HookDef {
@@ -82,7 +98,7 @@ impl HookDef {
             }],
             HookDef::Table { script, shell } => vec![Hook {
                 hook: hook_type,
-                script,
+                script: script.into_script(),
                 shell,
                 task_name: None,
                 global: false,
