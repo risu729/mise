@@ -76,6 +76,8 @@ pub type BackendMap = BTreeMap<String, ABackend>;
 pub type BackendList = Vec<ABackend>;
 pub type VersionCacheManager = CacheManager<Vec<VersionInfo>>;
 
+pub(crate) const MISE_BINS_DIR: &str = ".mise-bins";
+
 /// Remaps a backend-discovered path from the concrete install dir to the
 /// runtime path users put on PATH.
 ///
