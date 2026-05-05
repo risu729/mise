@@ -58,7 +58,7 @@ pub enum Hooks {
 pub enum HookDef {
     /// Simple script string: `enter = "echo hello"`
     Script(String),
-    /// Table with script and optional shell: `enter = { script = "echo hello", shell = "bash" }`
+    /// Table with script (string or array) and optional shell: `enter = { script = "echo hello", shell = "bash" }`
     Table {
         script: HookScript,
         shell: Option<String>,
