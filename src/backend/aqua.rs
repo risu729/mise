@@ -479,9 +479,10 @@ impl Backend for AquaBackend {
         _config: &Arc<Config>,
         tv: &ToolVersion,
     ) -> Result<Vec<PathBuf>> {
+        let runtime_path = tv.runtime_path();
         let mise_bins_dir = tv.install_path().join(".mise-bins");
         if self.symlink_bins(tv) || mise_bins_dir.is_dir() {
-            return Ok(vec![mise_bins_dir]);
+            return Ok(vec![runtime_path.join(".mise-bins")]);
         }
 
         let install_path = tv.install_path();
@@ -529,7 +530,7 @@ impl Backend for AquaBackend {
             })
             .await?
             .iter()
-            .map(|p| p.mount(&install_path))
+            .map(|p| p.mount(&runtime_path))
             .collect();
         Ok(paths)
     }

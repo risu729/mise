@@ -76,6 +76,20 @@ pub type BackendMap = BTreeMap<String, ABackend>;
 pub type BackendList = Vec<ABackend>;
 pub type VersionCacheManager = CacheManager<Vec<VersionInfo>>;
 
+pub(crate) fn runtime_path_for_install_path(tv: &ToolVersion, path: PathBuf) -> PathBuf {
+    let install_path = tv.install_path();
+    if let Ok(relative_path) = path.strip_prefix(&install_path) {
+        let runtime_path = tv.runtime_path();
+        if relative_path.as_os_str().is_empty() {
+            runtime_path
+        } else {
+            runtime_path.join(relative_path)
+        }
+    } else {
+        path
+    }
+}
+
 static STRICT_METADATA: AtomicBool = AtomicBool::new(false);
 
 pub fn set_strict_metadata(strict: bool) {
@@ -381,6 +395,10 @@ pub(crate) fn normalize_idiomatic_contents(contents: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cli::args::BackendResolution;
+    use crate::toolset::{ToolSource, ToolVersionOptions};
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     #[test]
     fn test_normalize_idiomatic_contents() {
@@ -403,6 +421,52 @@ mod tests {
             normalize_idiomatic_contents("# full line comment\n3.14.2 # inline comment\n   \n\n"),
             "3.14.2"
         );
+    }
+
+    #[test]
+    fn test_runtime_path_for_install_path_remaps_install_subpath() -> Result<()> {
+        let temp_dir = tempfile::tempdir()?;
+        let short = format!(
+            "runtime-remap-{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
+        let mut backend = BackendArg::new_raw(
+            short.clone(),
+            None,
+            short.clone(),
+            None,
+            BackendResolution::new(false),
+        );
+        backend.installs_path = temp_dir.path().join("installs").join(&short);
+        fs::create_dir_all(&backend.installs_path)?;
+
+        let install_path = backend.installs_path.join("1.0.1");
+        fs::create_dir_all(install_path.join("bin"))?;
+        file::make_symlink_or_file(Path::new("./1.0.1"), &backend.installs_path.join("latest"))?;
+
+        let request = ToolRequest::Version {
+            backend: Arc::new(backend),
+            version: "latest".into(),
+            options: ToolVersionOptions::default(),
+            source: ToolSource::Argument,
+        };
+        let tv = ToolVersion::new(request, "1.0.1".into());
+
+        assert_eq!(
+            runtime_path_for_install_path(&tv, install_path.join("bin")),
+            tv.runtime_path().join("bin")
+        );
+
+        let external_path = temp_dir.path().join("external").join("bin");
+        assert_eq!(
+            runtime_path_for_install_path(&tv, external_path.clone()),
+            external_path
+        );
+
+        Ok(())
     }
 
     #[test]
