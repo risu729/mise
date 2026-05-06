@@ -85,7 +85,7 @@ pub(crate) const MISE_BINS_DIR: &str = ".mise-bins";
 /// This intentionally does not call `ToolVersion::runtime_path()`: when a
 /// lockfile resolves a fuzzy request to a concrete version, `runtime_path()`
 /// returns the concrete install dir, but `bin-paths` should still use the
-/// requested runtime label.
+/// requested runtime label once that label exists.
 pub(crate) fn runtime_path_for_bin_paths(tv: &ToolVersion) -> PathBuf {
     let pathname = match &tv.request {
         ToolRequest::Version { version, .. } if version != &tv.version => version,
@@ -112,7 +112,11 @@ pub(crate) fn runtime_path_for_bin_paths(tv: &ToolVersion) -> PathBuf {
         }
     }
 
-    path
+    if path.is_dir() && is_runtime_symlink(&path) {
+        path
+    } else {
+        tv.runtime_path()
+    }
 }
 
 /// Remaps a backend-discovered path from the concrete install dir to the
@@ -521,7 +525,7 @@ mod tests {
     }
 
     #[test]
-    fn test_runtime_path_for_install_path_uses_request_label_without_symlink() -> Result<()> {
+    fn test_runtime_path_for_install_path_falls_back_without_symlink() -> Result<()> {
         let temp_dir = tempfile::tempdir()?;
         let short = format!(
             "runtime-remap-missing-symlink-{}",
@@ -553,7 +557,7 @@ mod tests {
 
         assert_eq!(
             runtime_path_for_install_path(&tv, install_path.join("bin")),
-            tv.ba().installs_path.join("latest").join("bin")
+            install_path.join("bin")
         );
 
         Ok(())
