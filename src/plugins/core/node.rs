@@ -897,19 +897,31 @@ fn node_lockfile_options(node: &SettingsNode) -> BTreeMap<String, String> {
     let compile = node.compile.unwrap_or(false);
     if compile {
         opts.insert("compile".to_string(), "true".to_string());
-        if let Some(cflags) = node.cflags.clone() {
+        if let Some(cflags) = node.cflags() {
             opts.insert("cflags".to_string(), cflags);
         }
-        if let Some(configure_opts) = node.configure_opts.clone() {
+        if let Some(configure_opts) = node
+            .configure_opts
+            .clone()
+            .or_else(|| env::var("NODE_CONFIGURE_OPTS").ok())
+        {
             opts.insert("configure_opts".to_string(), configure_opts);
         }
         if let Some(make) = node.make.clone() {
             opts.insert("make".to_string(), make);
         }
-        if let Some(make_opts) = node.make_opts.clone() {
+        if let Some(make_opts) = node
+            .make_opts
+            .clone()
+            .or_else(|| env::var("NODE_MAKE_OPTS").ok())
+        {
             opts.insert("make_opts".to_string(), make_opts);
         }
-        if let Some(make_install_opts) = node.make_install_opts.clone() {
+        if let Some(make_install_opts) = node
+            .make_install_opts
+            .clone()
+            .or_else(|| env::var("NODE_MAKE_INSTALL_OPTS").ok())
+        {
             opts.insert("make_install_opts".to_string(), make_install_opts);
         }
         if let Some(ninja) = node.ninja {
