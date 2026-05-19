@@ -723,10 +723,10 @@ impl Backend for NodePlugin {
     fn resolve_lockfile_options(
         &self,
         _request: &ToolRequest,
-        target: &PlatformTarget,
+        _target: &PlatformTarget,
     ) -> BTreeMap<String, String> {
         let settings = Settings::get();
-        node_lockfile_options(&settings.node, target.is_current())
+        node_lockfile_options(&settings.node)
     }
 
     async fn resolve_lock_info(
@@ -885,10 +885,7 @@ fn mirror_url_for(node: &crate::config::settings::SettingsNode, filename: &str) 
     mirror
 }
 
-fn node_lockfile_options(
-    node: &SettingsNode,
-    is_current_platform: bool,
-) -> BTreeMap<String, String> {
+fn node_lockfile_options(node: &SettingsNode) -> BTreeMap<String, String> {
     let mut opts = BTreeMap::new();
 
     let mirror_url = node.mirror_url().to_string();
@@ -897,38 +894,22 @@ fn node_lockfile_options(
     }
 
     // Only include compile option if true (non-default)
-    let compile = if is_current_platform {
-        node.compile.unwrap_or(false)
-    } else {
-        false
-    };
+    let compile = node.compile.unwrap_or(false);
     if compile {
         opts.insert("compile".to_string(), "true".to_string());
-        if let Some(cflags) = node.cflags() {
+        if let Some(cflags) = node.cflags.clone() {
             opts.insert("cflags".to_string(), cflags);
         }
-        if let Some(configure_opts) = node
-            .configure_opts
-            .clone()
-            .or_else(|| env::var("NODE_CONFIGURE_OPTS").ok())
-        {
+        if let Some(configure_opts) = node.configure_opts.clone() {
             opts.insert("configure_opts".to_string(), configure_opts);
         }
         if let Some(make) = node.make.clone() {
             opts.insert("make".to_string(), make);
         }
-        if let Some(make_opts) = node
-            .make_opts
-            .clone()
-            .or_else(|| env::var("NODE_MAKE_OPTS").ok())
-        {
+        if let Some(make_opts) = node.make_opts.clone() {
             opts.insert("make_opts".to_string(), make_opts);
         }
-        if let Some(make_install_opts) = node
-            .make_install_opts
-            .clone()
-            .or_else(|| env::var("NODE_MAKE_INSTALL_OPTS").ok())
-        {
+        if let Some(make_install_opts) = node.make_install_opts.clone() {
             opts.insert("make_install_opts".to_string(), make_install_opts);
         }
         if let Some(ninja) = node.ninja {
@@ -1026,7 +1007,7 @@ mod tests {
         };
 
         assert_eq!(
-            node_lockfile_options(&node, false),
+            node_lockfile_options(&node),
             BTreeMap::from([
                 (
                     "mirror_url".to_string(),
@@ -1053,7 +1034,7 @@ mod tests {
         };
 
         assert_eq!(
-            node_lockfile_options(&node, true),
+            node_lockfile_options(&node),
             BTreeMap::from([
                 ("cflags".to_string(), "-O2".to_string()),
                 ("compile".to_string(), "true".to_string()),
