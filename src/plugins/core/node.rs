@@ -7,7 +7,7 @@ use crate::build_time::built_info;
 use crate::cache::CacheManagerBuilder;
 use crate::cli::args::BackendArg;
 use crate::cmd::CmdLineRunner;
-use crate::config::settings::DEFAULT_NODE_MIRROR_URL;
+use crate::config::settings::{DEFAULT_NODE_MIRROR_URL, SettingsNode};
 use crate::config::{Config, Settings};
 use crate::file::{TarFormat, TarOptions};
 use crate::http::{HTTP, HTTP_FETCH};
@@ -725,27 +725,8 @@ impl Backend for NodePlugin {
         _request: &ToolRequest,
         target: &PlatformTarget,
     ) -> BTreeMap<String, String> {
-        let mut opts = BTreeMap::new();
         let settings = Settings::get();
-        let is_current_platform = target.is_current();
-
-        // Only include compile option if true (non-default)
-        let compile = if is_current_platform {
-            settings.node.compile.unwrap_or(false)
-        } else {
-            false
-        };
-        if compile {
-            opts.insert("compile".to_string(), "true".to_string());
-        }
-
-        // Flavor affects which binary variant is downloaded
-        // Apply to all platforms to avoid splitting lockfile entries (#8390)
-        if let Some(flavor) = settings.node.flavor.clone() {
-            opts.insert("flavor".to_string(), flavor);
-        }
-
-        opts
+        node_lockfile_options(&settings.node, target.is_current())
     }
 
     async fn resolve_lock_info(
@@ -904,6 +885,66 @@ fn mirror_url_for(node: &crate::config::settings::SettingsNode, filename: &str) 
     mirror
 }
 
+fn node_lockfile_options(
+    node: &SettingsNode,
+    is_current_platform: bool,
+) -> BTreeMap<String, String> {
+    let mut opts = BTreeMap::new();
+
+    let mirror_url = node.mirror_url().to_string();
+    if mirror_url != DEFAULT_NODE_MIRROR_URL {
+        opts.insert("mirror_url".to_string(), mirror_url);
+    }
+
+    // Only include compile option if true (non-default)
+    let compile = if is_current_platform {
+        node.compile.unwrap_or(false)
+    } else {
+        false
+    };
+    if compile {
+        opts.insert("compile".to_string(), "true".to_string());
+        if let Some(cflags) = node.cflags() {
+            opts.insert("cflags".to_string(), cflags);
+        }
+        if let Some(configure_opts) = node
+            .configure_opts
+            .clone()
+            .or_else(|| env::var("NODE_CONFIGURE_OPTS").ok())
+        {
+            opts.insert("configure_opts".to_string(), configure_opts);
+        }
+        if let Some(make) = node.make.clone() {
+            opts.insert("make".to_string(), make);
+        }
+        if let Some(make_opts) = node
+            .make_opts
+            .clone()
+            .or_else(|| env::var("NODE_MAKE_OPTS").ok())
+        {
+            opts.insert("make_opts".to_string(), make_opts);
+        }
+        if let Some(make_install_opts) = node
+            .make_install_opts
+            .clone()
+            .or_else(|| env::var("NODE_MAKE_INSTALL_OPTS").ok())
+        {
+            opts.insert("make_install_opts".to_string(), make_install_opts);
+        }
+        if let Some(ninja) = node.ninja {
+            opts.insert("ninja".to_string(), ninja.to_string());
+        }
+    }
+
+    // Flavor affects which binary variant is downloaded.
+    // Apply to all platforms to avoid splitting lockfile entries (#8390).
+    if let Some(flavor) = node.flavor.clone() {
+        opts.insert("flavor".to_string(), flavor);
+    }
+
+    opts
+}
+
 fn os() -> &'static str {
     NodePlugin::map_os(built_info::CFG_OS)
 }
@@ -974,5 +1015,54 @@ mod tests {
         let musl = mirror_url_for(&node, "node-v24.14.0-linux-x64-musl.tar.gz");
         assert_eq!(glibc.as_str(), "https://corp.example/node/");
         assert_eq!(musl.as_str(), "https://corp.example/node/");
+    }
+
+    #[test]
+    fn test_node_lockfile_options_include_mirror_and_flavor() {
+        let node = SettingsNode {
+            mirror_url: Some("https://corp.example/node/".to_string()),
+            flavor: Some("musl".to_string()),
+            ..Default::default()
+        };
+
+        assert_eq!(
+            node_lockfile_options(&node, false),
+            BTreeMap::from([
+                (
+                    "mirror_url".to_string(),
+                    "https://corp.example/node/".to_string()
+                ),
+                ("flavor".to_string(), "musl".to_string()),
+            ])
+        );
+    }
+
+    #[test]
+    fn test_node_lockfile_options_include_source_build_inputs() {
+        let node = SettingsNode {
+            compile: Some(true),
+            mirror_url: Some(DEFAULT_NODE_MIRROR_URL.to_string()),
+            cflags: Some("-O2".to_string()),
+            configure_opts: Some("--openssl-no-asm".to_string()),
+            make: Some("gmake".to_string()),
+            make_opts: Some("-s".to_string()),
+            make_install_opts: Some("--no-strip".to_string()),
+            concurrency: Some(16),
+            ninja: Some(false),
+            ..Default::default()
+        };
+
+        assert_eq!(
+            node_lockfile_options(&node, true),
+            BTreeMap::from([
+                ("cflags".to_string(), "-O2".to_string()),
+                ("compile".to_string(), "true".to_string()),
+                ("configure_opts".to_string(), "--openssl-no-asm".to_string()),
+                ("make".to_string(), "gmake".to_string()),
+                ("make_install_opts".to_string(), "--no-strip".to_string()),
+                ("make_opts".to_string(), "-s".to_string()),
+                ("ninja".to_string(), "false".to_string()),
+            ])
+        );
     }
 }
