@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1Q6VVB34CZ13E0J24HV3FY1",
+  "strategy": "manual-commit",
+  "branch": "agent/rust-cache-verify",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "schema/mise-task.json",
+    "schema/mise.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 1320,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 302208,
+    "output_tokens": 214,
+    "api_call_count": 3
+  }
+}
