@@ -1,0 +1,21 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1Q6TQZG3QB0DG8RD4Q5DWQX",
+  "strategy": "manual-commit",
+  "branch": "schema/vars-parser-shapes",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "e2e/config/test_schema_tombi",
+    "schema/mise-task.json",
+    "schema/mise.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}
