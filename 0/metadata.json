@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1R21S1A54FM5PDMDBVGWDD2",
+  "session_id": "01a06dae-8a8e-7cf2-98ff-4100712e4305",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-05T05:53:27.076439855Z",
+  "branch": "fix/rust-complete-profile-components",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "e2e/core/test_rust_components_reconcile",
+    "src/plugins/core/rust.rs"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "8c2674543a96",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 80750,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1177600,
+    "output_tokens": 3476,
+    "api_call_count": 738
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-05T05:53:25.731121551Z",
+    "agent_lines": 32,
+    "agent_removed": 132,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 32,
+    "total_lines_changed": 164,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
