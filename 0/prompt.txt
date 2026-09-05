@@ -1,0 +1,37 @@
+use subagents. 12531,12529,12521 are too large, split by scope. also is 12530 consistent with other fields accept both single and also array? i know some fields are like that in mise. why did the ci fail for 12528? if just flaky rerun with an empty commit, if it passes mark as ready
+
+---
+
+ok list up schema PRs again please
+
+---
+
+rebase conflicted prs
+
+---
+
+continue
+
+---
+
+resume codetabbit in all paused PRs (schema ones). explain why 12741 ci fialed
+
+---
+
+can we ignore Restrict state = "absent" to supported package managers.
+
+The schema accepts "apt:curl" = { state = "absent" }, but non-pacman managers reject removal at runtime with apt does not support declarative package removal. Restrict this value to pacman: entries and add a non-pacman invalid fixture.
+
+ this review on 12741?
+
+---
+
+ok create that pr, but do we need to fix the code? mise usually don't warn/error for that kind of unknown fields right
+
+---
+
+continue
+
+---
+
+continue

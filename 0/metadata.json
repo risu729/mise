@@ -1,0 +1,53 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1R234TW6RKEYCNYMBH5KE2T",
+  "session_id": "01a06dae-79ed-7550-a3d5-082c783c0a3d",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-05T05:54:16.771489987Z",
+  "branch": "fix/schema-package-absent-managers",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "e2e/config/test_schema_tombi",
+    "schema/mise.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "eee946ac1a1d",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 102799,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1650304,
+    "output_tokens": 3064,
+    "api_call_count": 505
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-05T05:54:15.497340427Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 3,
+    "total_committed": 0,
+    "total_lines_changed": 3,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 57,
+      "user_lines_removed": 3,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "e2e/config/test_schema_tombi": 9,
+        "schema/mise.json": 48
+      },
+      "user_removed_per_file": {
+        "e2e/config/test_schema_tombi": 1,
+        "schema/mise.json": 2
+      }
+    }
+  ]
+}
