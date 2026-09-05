@@ -1,0 +1,17 @@
+continue
+
+---
+
+can you split the pr? it's too large. tell me how to split first before start implementing
+
+---
+
+shouldnt we split aliases and complete?
+
+---
+
+no more split? are they all focused?
+
+---
+
+ok go ahead. you may use subagents. you MUST use subagents to review PRs. address ai reviews on PR as well
