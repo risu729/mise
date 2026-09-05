@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1QXWP1HJC80MQD3E04R5F3N",
+  "strategy": "manual-commit",
+  "branch": "fix/rust-complete-profile-components",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/lang/rust.md",
+    "e2e/core/test_rust_components_reconcile",
+    "src/plugins/core/rust.rs"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 21284,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1345408,
+    "output_tokens": 7931,
+    "api_call_count": 13
+  }
+}
