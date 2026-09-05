@@ -1,0 +1,37 @@
+{
+  "cli_version": "0.10.5",
+  "checkpoint_id": "01M1QYNW3TX7FX8YRFWMM6WEBB",
+  "session_id": "01a06dae-8a8e-7cf2-98ff-4100712e4305",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-05T04:54:33.26239236Z",
+  "branch": "fix/rust-required-profile-components",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/plugins/core/rust.rs"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-sol",
+  "turn_id": "83648782a14e",
+  "checkpoint_transcript_start": 4050,
+  "transcript_lines_at_start": 4050,
+  "compact_transcript_start": 526,
+  "token_usage": {
+    "input_tokens": 39745,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5250048,
+    "output_tokens": 10730,
+    "api_call_count": 41
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-05T04:54:32.092937562Z",
+    "agent_lines": 37,
+    "agent_removed": 443,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 37,
+    "total_lines_changed": 480,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}
